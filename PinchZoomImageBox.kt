@@ -3,8 +3,9 @@ package com.sarang.torang.di.image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,15 +22,14 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun PinchZoomImageBox(
     contents: @Composable (
-        @Composable (Modifier, String, Dp?, Dp?, ContentScale?, Dp?) -> Unit
+        @Composable (Modifier, String, Dp?, Dp?, ContentScale?, Dp?) -> Unit,
+        ZoomState
     ) -> Unit
 ) {
-    var zoomState by remember { mutableStateOf(ZoomState()) }
+    var zoomState by remember { mutableStateOf(ZoomState()) } // 줌 이미지로부터 상태를 전달받기 위한 state
     Box(Modifier.fillMaxSize())
     {
-        contents(provideZoomableTorangAsyncImage({
-            zoomState = it
-        }))
+        contents(provideZoomableTorangAsyncImage({ zoomState = it }), zoomState)
 
         if (zoomState.isZooming.value) {
             Box(
@@ -49,7 +49,8 @@ fun PinchZoomImageBox(
                 provideTorangAsyncImage().invoke(
                     Modifier
                         .offset(offsetX, offsetY)
-                        .size(400.dp)
+                        .fillMaxWidth()
+                        .height(zoomState.originHeight.value.dp)
                         .graphicsLayer {
                             scaleX = zoomState.scale.value
                             scaleY = zoomState.scale.value
@@ -61,7 +62,8 @@ fun PinchZoomImageBox(
                     zoomState.url.value,
                     30.dp,
                     30.dp,
-                    ContentScale.Crop
+                    ContentScale.Crop,
+                    null
                 )
             }
         }

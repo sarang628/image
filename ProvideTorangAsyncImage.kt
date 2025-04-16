@@ -4,6 +4,7 @@ import TorangAsyncImage
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
@@ -17,8 +18,8 @@ import androidx.compose.ui.unit.dp
 import com.sarang.torang.compose.feed.ZoomSnapshot
 import kotlinx.coroutines.flow.distinctUntilChanged
 
-fun provideTorangAsyncImage(): @Composable (Modifier, String, Dp?, Dp?, ContentScale?) -> Unit =
-    { modifier, model, progressSize, errorIconSize, contentScale ->
+fun provideTorangAsyncImage(): @Composable (Modifier, String, Dp?, Dp?, ContentScale?, Dp?) -> Unit =
+    { modifier, model, progressSize, errorIconSize, contentScale, height ->
         TorangAsyncImage(
             modifier = modifier,
             model = model,
@@ -29,8 +30,9 @@ fun provideTorangAsyncImage(): @Composable (Modifier, String, Dp?, Dp?, ContentS
     }
 
 fun provideZoomableTorangAsyncImage(onZoomState: (ZoomState) -> Unit = {}): @Composable (Modifier, String, Dp?, Dp?, ContentScale?, Dp?) -> Unit =
-    { modifier, model, progressSize, errorIconSize, contentScale, height ->
-        val zoomState = remember { ZoomState() }
+    { modifier, model, progressSize, errorIconSize, contentScale, originHeight ->
+        val zoomState =
+            remember { ZoomState(originHeight = mutableFloatStateOf(originHeight?.value ?: 0f)) }
 
         LaunchedEffect(zoomState) {
             snapshotFlow {

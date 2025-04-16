@@ -24,7 +24,8 @@ data class ZoomState(
     val offsetX: MutableState<Float> = mutableFloatStateOf(0f),
     val offsetY: MutableState<Float> = mutableFloatStateOf(0f),
     val isZooming: MutableState<Boolean> = mutableStateOf(false),
-    val url: MutableState<String> = mutableStateOf("")
+    val url: MutableState<String> = mutableStateOf(""),
+    val originHeight: MutableState<Float> = mutableFloatStateOf(0f)
 )
 
 @Stable
