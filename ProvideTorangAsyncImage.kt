@@ -1,24 +1,38 @@
 package com.sarang.torang.di.image
 
 import TorangAsyncImage
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.boundsInWindow
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.sarang.torang.compose.feed.ZoomSnapshot
+import com.sarang.torang.di.pinchzoom.PinchZoomState
+import com.sarang.torang.di.pinchzoom.ZoomSnapshot
+import com.sarang.torang.di.pinchzoom.pinchZoomAndTransform
 import kotlinx.coroutines.flow.distinctUntilChanged
 
-fun provideTorangAsyncImage(): @Composable (Modifier, String, Dp?, Dp?, ContentScale?) -> Unit =
+
+typealias TorangAsyncImageType = @Composable (
+    modifier: Modifier,
+    text: String,
+    width: Dp?,
+    height: Dp?,
+    contentScale: ContentScale?
+) -> Unit
+
+typealias ZoomableTorangAsyncImage = @Composable (
+    modifier: Modifier,
+    text: String,
+    width: Dp?,
+    height: Dp?,
+    contentScale: ContentScale?,
+    originHeight: Dp?
+) -> Unit
+
+fun provideTorangAsyncImage(): TorangAsyncImageType =
     { modifier, model, progressSize, errorIconSize, contentScale ->
         TorangAsyncImage(
             modifier = modifier,
@@ -29,65 +43,34 @@ fun provideTorangAsyncImage(): @Composable (Modifier, String, Dp?, Dp?, ContentS
         )
     }
 
-/**
- * @param modifier modifier
- */
-typealias ZoomableImage = @Composable (
-    modifier: Modifier,
-    text: String,
-    width: Dp?,
-    height: Dp?,
-    contentScale: ContentScale?,
-    cornerRadius: Dp?
-) -> Unit
-
-fun provideZoomableTorangAsyncImage(onZoomState: (ZoomState) -> Unit = {}): ZoomableImage =
+fun provideZoomableTorangAsyncImage(onZoomState: (PinchZoomState) -> Unit = {}): ZoomableTorangAsyncImage =
     { modifier, model, progressSize, errorIconSize, contentScale, originHeight ->
         val zoomState =
-            remember { ZoomState(originHeight = mutableFloatStateOf(originHeight?.value ?: 0f)) }
+            remember {
+                PinchZoomState(
+                    originHeight = originHeight?.value ?: 0f,
+                    url = model
+                )
+            }
 
         LaunchedEffect(zoomState) {
             snapshotFlow {
                 ZoomSnapshot(
-                    zoomState.scale.value,
-                    zoomState.offsetX.value,
-                    zoomState.offsetY.value,
-                    zoomState.isZooming.value,
-                    zoomState.url.value
+                    zoomState.accumulateZoom.value,
+                    zoomState.offset.value,
+                    zoomState.isZooming.value
                 )
-            }
-                .distinctUntilChanged()
+            }.distinctUntilChanged()
                 .collect {
                     onZoomState(zoomState)
                 }
         }
 
         TorangAsyncImage(
-            modifier = modifier
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onPress = {
-                            zoomState.url.value = model
-                            //onPressed.invoke()
-                            tryAwaitRelease()
-                            //onReleased.invoke()
-                        }
-                    )
-                }
-                .pinchZoomOverlay(zoomState)
-                .onGloballyPositioned { coordinates ->
-                    val bounds = coordinates.boundsInWindow()
-                    zoomState.bounds.value = bounds
-                }
-                .graphicsLayer {
-                    scaleX = zoomState.scale.value
-                    scaleY = zoomState.scale.value
-                    translationX = zoomState.offsetX.value
-                    translationY = zoomState.offsetY.value
-                },
+            modifier = modifier.pinchZoomAndTransform(zoomState),
             model = model,
             progressSize = progressSize ?: 50.dp,
             errorIconSize = errorIconSize ?: 50.dp,
-            contentScale = contentScale ?: ContentScale.Fit
+            contentScale = contentScale ?: ContentScale.Crop
         )
     }
