@@ -21,10 +21,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun PinchZoomImageBox(
-    contents: @Composable (
-        @Composable (Modifier, String, Dp?, Dp?, ContentScale?, Dp?) -> Unit,
-        ZoomState
-    ) -> Unit
+    contents: @Composable (ZoomableImage, ZoomState) -> Unit
 ) {
     var zoomState by remember { mutableStateOf(ZoomState()) } // 줌 이미지로부터 상태를 전달받기 위한 state
     Box(Modifier.fillMaxSize())
@@ -62,8 +59,7 @@ fun PinchZoomImageBox(
                     zoomState.url.value,
                     30.dp,
                     30.dp,
-                    ContentScale.Crop,
-                    null
+                    ContentScale.Crop
                 )
             }
         }

@@ -18,8 +18,8 @@ import androidx.compose.ui.unit.dp
 import com.sarang.torang.compose.feed.ZoomSnapshot
 import kotlinx.coroutines.flow.distinctUntilChanged
 
-fun provideTorangAsyncImage(): @Composable (Modifier, String, Dp?, Dp?, ContentScale?, Dp?) -> Unit =
-    { modifier, model, progressSize, errorIconSize, contentScale, height ->
+fun provideTorangAsyncImage(): @Composable (Modifier, String, Dp?, Dp?, ContentScale?) -> Unit =
+    { modifier, model, progressSize, errorIconSize, contentScale ->
         TorangAsyncImage(
             modifier = modifier,
             model = model,
@@ -29,7 +29,19 @@ fun provideTorangAsyncImage(): @Composable (Modifier, String, Dp?, Dp?, ContentS
         )
     }
 
-fun provideZoomableTorangAsyncImage(onZoomState: (ZoomState) -> Unit = {}): @Composable (Modifier, String, Dp?, Dp?, ContentScale?, Dp?) -> Unit =
+/**
+ * @param modifier modifier
+ */
+typealias ZoomableImage = @Composable (
+    modifier: Modifier,
+    text: String,
+    width: Dp?,
+    height: Dp?,
+    contentScale: ContentScale?,
+    cornerRadius: Dp?
+) -> Unit
+
+fun provideZoomableTorangAsyncImage(onZoomState: (ZoomState) -> Unit = {}): ZoomableImage =
     { modifier, model, progressSize, errorIconSize, contentScale, originHeight ->
         val zoomState =
             remember { ZoomState(originHeight = mutableFloatStateOf(originHeight?.value ?: 0f)) }
