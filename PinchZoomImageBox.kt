@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun PinchZoomImageBox(
     contents: @Composable (
-        @Composable (Modifier, String, Dp?, Dp?, ContentScale?) -> Unit
+        @Composable (Modifier, String, Dp?, Dp?, ContentScale?, Dp?) -> Unit
     ) -> Unit
 ) {
     var zoomState by remember { mutableStateOf(ZoomState()) }

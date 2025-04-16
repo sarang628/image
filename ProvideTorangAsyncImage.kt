@@ -28,8 +28,8 @@ fun provideTorangAsyncImage(): @Composable (Modifier, String, Dp?, Dp?, ContentS
         )
     }
 
-fun provideZoomableTorangAsyncImage(onZoomState: (ZoomState) -> Unit = {}): @Composable (Modifier, String, Dp?, Dp?, ContentScale?) -> Unit =
-    { modifier, model, progressSize, errorIconSize, contentScale ->
+fun provideZoomableTorangAsyncImage(onZoomState: (ZoomState) -> Unit = {}): @Composable (Modifier, String, Dp?, Dp?, ContentScale?, Dp?) -> Unit =
+    { modifier, model, progressSize, errorIconSize, contentScale, height ->
         val zoomState = remember { ZoomState() }
 
         LaunchedEffect(zoomState) {
