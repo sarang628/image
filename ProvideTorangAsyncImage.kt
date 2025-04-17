@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.sarang.torang.di.pinchzoom.ImageLoader
 import com.sarang.torang.di.pinchzoom.PinchZoomState
 import com.sarang.torang.di.pinchzoom.ZoomSnapshot
 import com.sarang.torang.di.pinchzoom.pinchZoomAndTransform
@@ -74,3 +75,15 @@ fun provideZoomableTorangAsyncImage(onZoomState: (PinchZoomState) -> Unit = {}):
             contentScale = contentScale ?: ContentScale.Crop
         )
     }
+
+
+/**
+ * 핀치줌 라이브러리 제공용 이미지로더
+ */
+fun provideImageLoader(): ImageLoader = { modifier: Modifier,
+                                          url: String,
+                                          contentScale: ContentScale? ->
+    @Composable {
+        provideTorangAsyncImage().invoke(modifier, url, 30.dp, 30.dp, contentScale)
+    }
+}
