@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.sarang.torang.di.pinchzoom.ImageLoader
 import com.sarang.torang.di.pinchzoom.PinchZoomState
 import com.sarang.torang.di.pinchzoom.ZoomSnapshot
+import com.sarang.torang.di.pinchzoom.isZooming
 import com.sarang.torang.di.pinchzoom.pinchZoomAndTransform
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -59,7 +60,7 @@ fun provideZoomableTorangAsyncImage(onZoomState: (PinchZoomState) -> Unit = {}):
                 ZoomSnapshot(
                     zoomState.accumulateZoom.value,
                     zoomState.offset.value,
-                    zoomState.isZooming.value
+                    zoomState.isZooming
                 )
             }.distinctUntilChanged()
                 .collect {
