@@ -26,12 +26,7 @@ typealias TorangAsyncImageType = @Composable (
 ) -> Unit
 
 typealias ZoomableTorangAsyncImage = @Composable (
-    modifier: Modifier,
-    text: String,
-    width: Dp?,
-    height: Dp?,
-    contentScale: ContentScale?,
-    originHeight: Dp?
+    ImageLoadData
 ) -> Unit
 
 fun provideTorangAsyncImage(): TorangAsyncImageType =
@@ -46,12 +41,12 @@ fun provideTorangAsyncImage(): TorangAsyncImageType =
     }
 
 fun provideZoomableTorangAsyncImage(onZoomState: (PinchZoomState) -> Unit = {}): ZoomableTorangAsyncImage =
-    { modifier, model, progressSize, errorIconSize, contentScale, originHeight ->
+    { data ->
         val zoomState =
             remember {
                 PinchZoomState(
-                    originHeight = originHeight?.value ?: 0f,
-                    url = model
+                    originHeight = data.height?.value ?: 0f,
+                    url = data.url ?: ""
                 )
             }
 
@@ -69,11 +64,11 @@ fun provideZoomableTorangAsyncImage(onZoomState: (PinchZoomState) -> Unit = {}):
         }
 
         TorangAsyncImage(
-            modifier = modifier.pinchZoomAndTransform(zoomState),
-            model = model,
-            progressSize = progressSize ?: 50.dp,
-            errorIconSize = errorIconSize ?: 50.dp,
-            contentScale = contentScale ?: ContentScale.Crop
+            modifier = data.modifier.pinchZoomAndTransform(zoomState),
+            model = data.url ?: "",
+            progressSize = data.progressSize,
+            errorIconSize = data.errorIconSize,
+            contentScale = data.contentScale
         )
     }
 
@@ -87,3 +82,12 @@ fun provideImageLoader(): ImageLoader =
       contentScale: ContentScale? ->
         provideTorangAsyncImage().invoke(modifier, url, 30.dp, 30.dp, contentScale)
     }
+
+data class ImageLoadData(
+    val modifier: Modifier = Modifier,
+    val url: String? = null,
+    val progressSize: Dp = 50.dp,
+    val errorIconSize: Dp = 50.dp,
+    val contentScale: ContentScale = ContentScale.Fit,
+    val height: Dp? = null
+)
