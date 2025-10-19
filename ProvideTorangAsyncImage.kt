@@ -72,17 +72,6 @@ fun provideZoomableTorangAsyncImage(onZoomState: (PinchZoomState) -> Unit = {}):
         )
     }
 
-
-/**
- * 핀치줌 라이브러리 제공용 이미지로더
- */
-fun provideImageLoader(): ImageLoader =
-    { modifier: Modifier,
-      url: String,
-      contentScale: ContentScale? ->
-        provideTorangAsyncImage().invoke(modifier, url, 30.dp, 30.dp, contentScale)
-    }
-
 data class ImageLoadData(
     val modifier: Modifier = Modifier,
     val url: String? = null,
