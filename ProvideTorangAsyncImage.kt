@@ -45,7 +45,7 @@ fun provideZoomableTorangAsyncImage(onZoomState: (PinchZoomState) -> Unit = {}):
         val zoomState =
             remember {
                 PinchZoomState(
-                    originHeight = data.height?.value ?: 0f,
+                    originHeight = data.height ?: 0.dp,
                     url = data.url ?: ""
                 )
             }
