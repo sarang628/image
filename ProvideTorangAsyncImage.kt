@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.sarang.torang.di.pinchzoom.ImageLoader
 import com.sarang.torang.di.pinchzoom.PinchZoomState
 import com.sarang.torang.di.pinchzoom.ZoomSnapshot
 import com.sarang.torang.di.pinchzoom.isZooming
@@ -17,26 +16,28 @@ import com.sarang.torang.di.pinchzoom.pinchZoomAndTransform
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 
-typealias TorangAsyncImageType = @Composable (
-    modifier: Modifier,
-    text: String,
-    width: Dp?,
-    height: Dp?,
-    contentScale: ContentScale?
-) -> Unit
+typealias TorangAsyncImageType = @Composable (TorangAsyncImageData) -> Unit
 
 typealias ZoomableTorangAsyncImage = @Composable (
     ImageLoadData
 ) -> Unit
 
-fun provideTorangAsyncImage(): TorangAsyncImageType =
-    { modifier, model, progressSize, errorIconSize, contentScale ->
+data class TorangAsyncImageData(
+    val modifier            : Modifier      = Modifier,
+    val model               : Any?          = "",
+    val progressSize        : Dp            = 50.dp,
+    val errorIconSize       : Dp            = 50.dp,
+    val contentScale        : ContentScale  = ContentScale.Fit,
+    val contentDescription  : String?       = null,
+)
+
+fun provideTorangAsyncImage(): TorangAsyncImageType = {
         TorangAsyncImage(
-            modifier = modifier,
-            model = model,
-            progressSize = progressSize ?: 50.dp,
-            errorIconSize = errorIconSize ?: 50.dp,
-            contentScale = contentScale ?: ContentScale.Fit
+            modifier = it.modifier,
+            model = it.model,
+            progressSize = it.progressSize,
+            errorIconSize = it.errorIconSize,
+            contentScale = it.contentScale
         )
     }
 
